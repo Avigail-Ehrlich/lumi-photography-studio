@@ -615,3 +615,9 @@ a:hover { opacity: .76; }
 .reveal-section.is-visible .gallery-tile::after { animation: ruleDown 1s cubic-bezier(.6,.1,.3,1) .25s backwards; }
 @keyframes ruleAcross { from { transform: scaleX(0); } }
 @keyframes ruleDown { from { transform: scaleY(0); } }
+
+/* Header logo: the light logo (already approved by content filters) rendered dark for the light header */
+.brand-logo-header img { filter: brightness(.18); }
+/* Hero runs edge to edge; the copy keeps the header's 1500px content edge on wide screens */
+.hero-content { padding-inline-start: max(64px, calc((100vw - 1500px) / 2 + 64px)); }
+@media (max-width: 900px) { .hero-content { padding-inline-start: 20px; } }

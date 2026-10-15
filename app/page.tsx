@@ -98,12 +98,12 @@ const safeImageAlt = (src: string) => collagePhotoTiles.find((tile) => tile.src 
 const collageShapes = collagePhotoTiles.map((tile): Shape => Number(tile.d.split("span").pop()) >= 2 ? "landscape" : "portrait");
 const IMAGE_MODE_KEY = "image-mode";
 
-// Content filters (נטיב, רימון וכו') replace a blocked image with a 3x3 mosaic of flat colour blocks,
-// with a "blocked" icon in the centre block. A real photo never has eight perfectly flat regions.
+// Content filters (נטיב, רימון, NetFree) replace a blocked image with a mosaic of flat colour blocks
+// (3x3 when blocked, 5x5 while "sent for review"), with an icon in the centre. A real photo never has
+// nearly every block perfectly flat, so try each grid size and count the flat blocks.
 function isMosaic(img: HTMLImageElement) {
   try {
-    const size = 60;
-    const cell = size / 3;
+    const size = 120; // divisible by every grid size below
     const canvas = document.createElement("canvas");
     canvas.width = size;
     canvas.height = size;
@@ -111,24 +111,31 @@ function isMosaic(img: HTMLImageElement) {
     if (!ctx) return false;
     ctx.drawImage(img, 0, 0, size, size);
     const { data } = ctx.getImageData(0, 0, size, size);
-    let flatCells = 0;
-    for (let row = 0; row < 3; row++) {
-      for (let col = 0; col < 3; col++) {
-        if (row === 1 && col === 1) continue;
-        const values: number[] = [];
-        // Sample the inside of the block, away from the edges where JPEG blends neighbours
-        for (let y = row * cell + 5; y < (row + 1) * cell - 5; y++) {
-          for (let x = col * cell + 5; x < (col + 1) * cell - 5; x++) {
-            const i = (y * size + x) * 4;
-            values.push(data[i] * 0.3 + data[i + 1] * 0.59 + data[i + 2] * 0.11);
-          }
+    const isFlat = (x0: number, y0: number, cell: number) => {
+      // Sample the inside of the block, away from the edges where JPEG blends neighbours
+      const margin = Math.round(cell / 4);
+      const values: number[] = [];
+      for (let y = y0 + margin; y < y0 + cell - margin; y++) {
+        for (let x = x0 + margin; x < x0 + cell - margin; x++) {
+          const i = (y * size + x) * 4;
+          values.push(data[i] * 0.3 + data[i + 1] * 0.59 + data[i + 2] * 0.11);
         }
-        const mean = values.reduce((sum, value) => sum + value, 0) / values.length;
-        const variance = values.reduce((sum, value) => sum + (value - mean) ** 2, 0) / values.length;
-        if (Math.sqrt(variance) < 3) flatCells++;
       }
-    }
-    return flatCells === 8;
+      const mean = values.reduce((sum, value) => sum + value, 0) / values.length;
+      const variance = values.reduce((sum, value) => sum + (value - mean) ** 2, 0) / values.length;
+      return Math.sqrt(variance) < 3;
+    };
+    return [3, 4, 5, 6].some((grid) => {
+      const cell = size / grid;
+      let flatCells = 0;
+      for (let row = 0; row < grid; row++) {
+        for (let col = 0; col < grid; col++) {
+          if (isFlat(col * cell, row * cell, cell)) flatCells++;
+        }
+      }
+      // The icon covers the centre block (or the four centre blocks on an even grid)
+      return flatCells >= grid * grid - (grid % 2 === 1 ? 1 : 4);
+    });
   } catch {
     return false;
   }
@@ -338,7 +345,7 @@ export default function Home() {
     <main dir="rtl" className="overflow-hidden bg-[var(--cream)] text-[var(--ink)]">
       <header className="relative z-20 border-b border-[var(--line)] bg-[var(--cream)] text-[var(--ink)]">
         <div className="mx-auto flex h-20 max-w-[1500px] items-center justify-between px-5 sm:px-10 lg:px-16">
-          <a href="#top" className="brand-logo" aria-label="MB Photographer — דף הבית"><img src="/images/logo-dark.png" alt="MB Photographer" /></a>
+          <a href="#top" className="brand-logo brand-logo-header" aria-label="MB Photographer — דף הבית"><img src="/images/logo-light.png" alt="MB Photographer" /></a>
           <nav className="header-nav hidden items-center gap-7 text-sm lg:flex" aria-label="ניווט ראשי">
             <a href="#portfolio">עבודות</a><a href="#sessions">סוגי צילום</a><a href="#about">אודות</a><a href="#testimonials">המלצות</a><a href="#pricing">מחירון</a><a href="#faq">שאלות</a><a href="#contact">יצירת קשר</a>
           </nav>
@@ -347,7 +354,7 @@ export default function Home() {
       </header>
 
       <section id="top" className="hero-section">
-        <div className="hero-grid mx-auto max-w-[1500px]">
+        <div className="hero-grid">
           <div className="hero-content">
             <p className="eyebrow mb-7">צילום משפחה · חלאקה · בת מצווה</p>
             <h1 className="display-title">הרגעים הקטנים<br />הם הסיפור.</h1>
