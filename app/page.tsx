@@ -152,7 +152,7 @@ function CheckedImage({ src, alt, onBlocked }: { src: string; alt: string; onBlo
     if (!img) return;
     if (img.naturalWidth === 0 || isMosaic(img)) { onBlocked(src); return; }
     // Lets the gallery's justified rows size the tile to the photo
-    img.parentElement?.style.setProperty("--ratio", String(img.naturalWidth / img.naturalHeight));
+    (img.closest<HTMLElement>(".gallery-tile") ?? img.parentElement)?.style.setProperty("--ratio", String(img.naturalWidth / img.naturalHeight));
   }, [src, onBlocked]);
   // The image may have finished loading before hydration attached onLoad
   useEffect(() => { if (ref.current?.complete) check(); }, [check]);
@@ -433,7 +433,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section id="portfolio" className="gallery-wrap">
+      <section id="portfolio" className="reveal-section gallery-wrap">
         <div className="mx-auto max-w-[1500px] px-5 sm:px-10 lg:px-16">
           <div className="gallery-head">
             <div>
@@ -471,7 +471,7 @@ export default function Home() {
             <div className="gallery-masonry">
               {galleryImages.map((image, index) => (
                 <button key={`${activeCollection.id}-${index}`} type="button" className="gallery-tile" onClick={() => setLightbox({ images: galleryImages, index })} aria-label={`הגדלת התמונה: ${image.alt}`}>
-                  <CheckedImage src={image.src} alt={image.alt} onBlocked={markBlocked} />
+                  <span className="gallery-tile-media"><CheckedImage src={image.src} alt={image.alt} onBlocked={markBlocked} /></span>
                   <span className="gallery-tile-zoom" aria-hidden="true"><Plus size={20} strokeWidth={1.25} /></span>
                 </button>
               ))}
