@@ -594,3 +594,7 @@ a:hover { opacity: .76; }
 .filter-toggle { padding: 0; border: 0; border-bottom: 1px solid rgba(255,255,255,.25); background: none; color: inherit; font: inherit; cursor: pointer; transition: color .2s ease, border-color .2s ease; }
 .filter-toggle:hover, .filter-toggle:focus-visible, .filter-toggle[aria-pressed="true"] { color: var(--honey-light); border-color: currentColor; }
 .collage-link span { text-align: center; }
+
+/* About: brand logo above the intro copy */
+.about-logo { display: block; width: 180px; height: auto; opacity: .92; }
+@media (max-width: 640px) { .about-logo { width: 140px; } }

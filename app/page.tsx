@@ -359,6 +359,26 @@ export default function Home() {
         </div>
       </section>
 
+      <section id="about" className="reveal-section bg-[var(--espresso)] text-white">
+        <div className="mx-auto grid max-w-[1500px] lg:grid-cols-2">
+          <div className="about-photo relative min-h-[520px] lg:min-h-[760px]">
+            <div className={`about-photo-image ${isBlocked(ABOUT_SRC) ? "is-filtered" : ""}`} role="img" aria-label="תמונת מצלמת צילום משפחה" />
+          </div>
+          <div className="reveal-copy flex items-center px-6 py-20 sm:px-14 lg:px-20 lg:py-24">
+            <div className="max-w-xl">
+              <img src="/images/logo-light.png" alt="MB Photographer" className="about-logo" />
+              <p className="eyebrow mt-8 text-[var(--honey-light)]">נעים להכיר</p>
+              <h2 className="section-title mt-5 text-white">אני מצלמת את מה שקורה בין הרגעים.</h2>
+              <div className="mt-8 space-y-5 text-base leading-8 text-white/70 sm:text-lg">
+                <p>את הצחוק שמגיע אחרי המבוכה, את הידיים הקטנות, את הדרך שבה אתם מסתכלים זה על זו בלי לשים לב.</p>
+                <p>המטרה שלי היא לא ליצור יום מושלם. היא לשמור עבורכם משהו אמיתי ממנו.</p>
+              </div>
+              <a href="#contact" className="dark-link mt-10 inline-flex items-center gap-3">בואו נכיר <ArrowLeft size={17} strokeWidth={1.5} /></a>
+            </div>
+          </div>
+        </div>
+      </section>
+
       <section id="inspiration" className="reveal-section collage-section">
         <div className="mx-auto max-w-[1320px] px-5 sm:px-10 lg:px-16">
           <div className="mb-12 text-center">
@@ -389,14 +409,6 @@ export default function Home() {
               );
             })}
           </div>
-        </div>
-      </section>
-
-      <section className="reveal-section mx-auto grid max-w-[1320px] gap-12 px-5 py-24 sm:px-10 lg:grid-cols-[0.7fr_1.3fr] lg:gap-24 lg:px-16 lg:py-36">
-        <div><p className="section-kicker">הגישה שלי</p></div>
-        <div className="reveal-copy">
-          <h2 className="section-title max-w-4xl">לא צריך לדעת לעמוד מול מצלמה. צריך רק להגיע כמו שאתם.</h2>
-          <p className="mt-8 max-w-2xl text-base leading-8 text-[var(--muted-text)] sm:text-lg">אני יוצרת מרחב נעים שמאפשר לכם להישאר אתם. במהלך הצילום אני מכוונת כשצריך, ואז נותנת לרגעים הקטנים לקרות — מבט, תנועה, יד שמחפשת יד.</p>
         </div>
       </section>
 
@@ -475,25 +487,6 @@ export default function Home() {
       {lightbox !== null && (
         <Lightbox images={lightbox.images} index={lightbox.index} onClose={closeLightbox} onMove={moveLightbox} />
       )}
-
-      <section id="about" className="reveal-section bg-[var(--espresso)] text-white">
-        <div className="mx-auto grid max-w-[1500px] lg:grid-cols-2">
-          <div className="about-photo relative min-h-[520px] lg:min-h-[760px]">
-            <div className={`about-photo-image ${isBlocked(ABOUT_SRC) ? "is-filtered" : ""}`} role="img" aria-label="תמונת מצלמת צילום משפחה" />
-          </div>
-          <div className="reveal-copy flex items-center px-6 py-20 sm:px-14 lg:px-20 lg:py-24">
-            <div className="max-w-xl">
-              <p className="eyebrow text-[var(--honey-light)]">נעים להכיר</p>
-              <h2 className="section-title mt-5 text-white">אני מצלמת את מה שקורה בין הרגעים.</h2>
-              <div className="mt-8 space-y-5 text-base leading-8 text-white/70 sm:text-lg">
-                <p>את הצחוק שמגיע אחרי המבוכה, את הידיים הקטנות, את הדרך שבה אתם מסתכלים זה על זו בלי לשים לב.</p>
-                <p>המטרה שלי היא לא ליצור יום מושלם. היא לשמור עבורכם משהו אמיתי ממנו.</p>
-              </div>
-              <a href="#contact" className="dark-link mt-10 inline-flex items-center gap-3">בואו נכיר <ArrowLeft size={17} strokeWidth={1.5} /></a>
-            </div>
-          </div>
-        </div>
-      </section>
 
       <section id="testimonials" className="reveal-section testimonials-section">
         <div className="mx-auto max-w-[1400px] px-5 py-24 sm:px-10 lg:px-16 lg:py-32">
