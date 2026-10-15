@@ -568,7 +568,7 @@ export default function Home() {
                 <p className="contact-aside-text">כל פנייה מקבלת ממני תשובה אישית — לא הודעה אוטומטית — עם כמה שאלות קצרות שיעזרו לנו לתכנן נכון.</p>
               </div>
               <div className="contact-details">
-                <a href="mailto:hello@lumi-studio.co"><Mail size={17} strokeWidth={1.5} />hello@lumi-studio.co</a>
+                <a href="mailto:mirelmark2@gmail.com"><Mail size={17} strokeWidth={1.5} /><span dir="ltr">mirelmark2@gmail.com</span></a>
                 <a href="tel:+972548520516"><Phone size={17} strokeWidth={1.5} /><span dir="ltr">054-8520516</span></a>
               </div>
             </aside>
