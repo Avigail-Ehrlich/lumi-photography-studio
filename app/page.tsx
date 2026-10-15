@@ -72,7 +72,101 @@ const collageTiles: CollageTile[] = [
   { kind: "link", d: "9 / 5 / span 2 / span 2", m: "12 / 1", order: 14 },
 ];
 
-const collagePhotos = collageTiles.flatMap((tile) => tile.kind === "photo" ? [{ src: tile.src, alt: tile.alt }] : []);
+// Words are written one after another, in this order
+const collageWords = collageTiles.flatMap((tile) => tile.kind === "word" ? [tile.text] : []);
+const photosOf = (tiles: CollageTile[]) => tiles.flatMap((tile) => tile.kind === "photo" ? [{ src: tile.src, alt: tile.alt }] : []);
+
+// Images that pass the common Israeli content filters (checked by the photographer on a filtered line).
+// When a filter is detected, the site shows only these.
+const FILTER_SAFE_IMAGES = new Set([
+  "/images/collage/collage-07.jpg",
+  "/images/collage/collage-10.jpg",
+  "/images/collage/collage-19.jpg",
+  "/images/5X3A6715-2.JPG",
+  "/images/צילום%20שיפי%200548517049%20%2813%29.jpg",
+]);
+
+const safeTile = (src: string) => {
+  const tile = collageTiles.find((item) => item.kind === "photo" && item.src === src);
+  if (!tile || tile.kind !== "photo") throw new Error(`Missing collage photo ${src}`);
+  return tile;
+};
+
+// Collage built only from FILTER_SAFE_IMAGES: 6 cols x 4 rows on desktop, 2 cols x 6 rows on mobile.
+const filteredCollageTiles: CollageTile[] = [
+  { ...safeTile("/images/collage/collage-07.jpg"), d: "1 / 1 / span 2 / span 2", m: "1 / 1", order: 0 },
+  { ...safeTile("/images/collage/collage-10.jpg"), d: "1 / 3 / span 2 / span 1", m: "1 / 2 / span 2", order: 2 },
+  { kind: "word", text: "משפחה", d: "1 / 4 / span 2 / span 1", m: "2 / 1", order: 6 },
+  { ...safeTile("/images/collage/collage-19.jpg"), d: "1 / 5 / span 2 / span 2", m: "3 / 2", order: 1 },
+  { ...safeTile("/images/צילום%20שיפי%200548517049%20%2813%29.jpg"), d: "3 / 1 / span 2 / span 1", m: "3 / 1 / span 2", order: 3 },
+  { kind: "word", text: "אהבה", d: "3 / 2 / span 2 / span 2", m: "4 / 2", order: 7 },
+  { ...safeTile("/images/5X3A6715-2.JPG"), d: "3 / 4 / span 2 / span 1", m: "5 / 2 / span 2", order: 4 },
+  { kind: "word", text: "שמחה", d: "3 / 5 / span 2 / span 1", m: "5 / 1", order: 8 },
+  { kind: "link", d: "3 / 6 / span 2 / span 1", m: "6 / 1", order: 5 },
+];
+
+// Images the photographer's filter is known to block; if either comes back blocked, switch to filtered mode.
+const FILTER_PROBES = ["/images/collage/collage-11.jpg", "/images/collage/collage-17.jpg"];
+const IMAGE_MODE_KEY = "image-mode";
+const FILTER_DETECTED_KEY = "filter-detected";
+
+// Content filters (נטיב, רימון וכו') replace a blocked image with a 3x3 mosaic of flat colour blocks,
+// with a "blocked" icon in the centre block. A real photo never has eight perfectly flat regions.
+function isImageBlocked(src: string): Promise<boolean> {
+  return new Promise((resolve) => {
+    const img = new Image();
+    const timeout = window.setTimeout(() => resolve(false), 6000);
+    img.onerror = () => { window.clearTimeout(timeout); resolve(true); };
+    img.onload = () => {
+      window.clearTimeout(timeout);
+      try {
+        const size = 60;
+        const cell = size / 3;
+        const canvas = document.createElement("canvas");
+        canvas.width = size;
+        canvas.height = size;
+        const ctx = canvas.getContext("2d", { willReadFrequently: true });
+        if (!ctx) return resolve(false);
+        ctx.drawImage(img, 0, 0, size, size);
+        const { data } = ctx.getImageData(0, 0, size, size);
+        let flatCells = 0;
+        for (let row = 0; row < 3; row++) {
+          for (let col = 0; col < 3; col++) {
+            if (row === 1 && col === 1) continue;
+            const values: number[] = [];
+            // Sample the inside of the block, away from the edges where JPEG blends neighbours
+            for (let y = row * cell + 5; y < (row + 1) * cell - 5; y++) {
+              for (let x = col * cell + 5; x < (col + 1) * cell - 5; x++) {
+                const i = (y * size + x) * 4;
+                values.push(data[i] * 0.3 + data[i + 1] * 0.59 + data[i + 2] * 0.11);
+              }
+            }
+            const mean = values.reduce((sum, value) => sum + value, 0) / values.length;
+            const variance = values.reduce((sum, value) => sum + (value - mean) ** 2, 0) / values.length;
+            if (Math.sqrt(variance) < 3) flatCells++;
+          }
+        }
+        resolve(flatCells === 8);
+      } catch {
+        resolve(false);
+      }
+    };
+    img.src = src;
+  });
+}
+
+// A manual choice (footer toggle) wins; otherwise probe once per visit for a content filter.
+async function resolveFilteredMode() {
+  const read = (storage: () => Storage, key: string) => { try { return storage().getItem(key); } catch { return null; } };
+  const manual = read(() => localStorage, IMAGE_MODE_KEY);
+  if (manual) return manual === "filtered";
+  const detected = read(() => sessionStorage, FILTER_DETECTED_KEY);
+  if (detected) return detected === "1";
+
+  const blocked = (await Promise.all(FILTER_PROBES.map(isImageBlocked))).some(Boolean);
+  try { sessionStorage.setItem(FILTER_DETECTED_KEY, blocked ? "1" : "0"); } catch {}
+  return blocked;
+}
 
 // Placeholder quotes: replace with real testimonials before going live.
 const testimonials = [
@@ -177,7 +271,24 @@ export default function Home() {
   const [activeTab, setActiveTab] = useState(galleryCollections[0].id);
   const [lightbox, setLightbox] = useState<{ images: GalleryImage[]; index: number } | null>(null);
   const activeCollection = galleryCollections.find((collection) => collection.id === activeTab) ?? galleryCollections[0];
-  const placeholderCount = Math.max(0, MIN_GALLERY_TILES - activeCollection.images.length);
+  const [filtered, setFiltered] = useState(false);
+  const galleryImages = filtered ? activeCollection.images.filter((image) => FILTER_SAFE_IMAGES.has(image.src)) : activeCollection.images;
+  const placeholderCount = filtered ? 0 : Math.max(0, MIN_GALLERY_TILES - galleryImages.length);
+  const activeCollageTiles = filtered ? filteredCollageTiles : collageTiles;
+  const collagePhotos = photosOf(activeCollageTiles);
+
+  useEffect(() => {
+    let cancelled = false;
+    resolveFilteredMode().then((value) => { if (!cancelled) setFiltered(value); });
+    return () => { cancelled = true; };
+  }, []);
+
+  const toggleFiltered = () => {
+    const next = !filtered;
+    setFiltered(next);
+    setLightbox(null);
+    try { localStorage.setItem(IMAGE_MODE_KEY, next ? "filtered" : "full"); } catch {}
+  };
 
   const openSession = (id: string) => {
     setActiveTab(id);
@@ -237,11 +348,12 @@ export default function Home() {
             <p className="section-kicker">השראה</p>
             <h2 className="section-title mt-4">לתפוס את הרגע</h2>
           </div>
-          <div className="collage">
-            {collageTiles.map((tile) => {
+          <div key={filtered ? "filtered" : "full"} className="collage">
+            {activeCollageTiles.map((tile) => {
               const style = { "--area-d": tile.d, "--area-m": tile.m, "--order": tile.order } as CSSProperties;
               if (tile.kind === "word") {
-                return <div key={tile.text} className="collage-tile collage-word" style={style}><span>{tile.text}</span></div>;
+                const wordStyle = { ...style, "--word": collageWords.indexOf(tile.text) } as CSSProperties;
+                return <div key={tile.text} className="collage-tile collage-word" style={wordStyle}><span>{tile.text}</span></div>;
               }
               if (tile.kind === "link") {
                 return (
@@ -326,8 +438,8 @@ export default function Home() {
             )}
 
             <div className="gallery-masonry">
-              {activeCollection.images.map((image, index) => (
-                <button key={image.src} type="button" className="gallery-tile" onClick={() => setLightbox({ images: activeCollection.images, index })} aria-label={`הגדלת התמונה: ${image.alt}`}>
+              {galleryImages.map((image, index) => (
+                <button key={image.src} type="button" className="gallery-tile" onClick={() => setLightbox({ images: galleryImages, index })} aria-label={`הגדלת התמונה: ${image.alt}`}>
                   <img src={image.src} alt={image.alt} loading="lazy" />
                   <span className="gallery-tile-zoom" aria-hidden="true"><Plus size={20} strokeWidth={1.25} /></span>
                 </button>
@@ -349,7 +461,7 @@ export default function Home() {
       <section id="about" className="reveal-section bg-[var(--espresso)] text-white">
         <div className="mx-auto grid max-w-[1500px] lg:grid-cols-2">
           <div className="about-photo relative min-h-[520px] lg:min-h-[760px]">
-            <div className="about-photo-image" role="img" aria-label="תמונת מצלמת צילום משפחה" />
+            <div className={`about-photo-image ${filtered ? "is-filtered" : ""}`} role="img" aria-label="תמונת מצלמת צילום משפחה" />
           </div>
           <div className="reveal-copy flex items-center px-6 py-20 sm:px-14 lg:px-20 lg:py-24">
             <div className="max-w-xl">
@@ -474,6 +586,9 @@ export default function Home() {
             האתר עוצב ונבנה ע״י
             <span className="credit-mark" dir="ltr">AJ<span>enda</span> Studio</span>
           </p>
+          <button type="button" className="filter-toggle" onClick={toggleFiltered} aria-pressed={filtered}>
+            {filtered ? "תצוגה מותאמת לסינון: פעילה" : "תצוגה מותאמת לסינון"}
+          </button>
         </div>
       </footer>
     </main>
