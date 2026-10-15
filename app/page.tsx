@@ -98,12 +98,13 @@ const safeImageAlt = (src: string) => collagePhotoTiles.find((tile) => tile.src 
 const collageShapes = collagePhotoTiles.map((tile): Shape => Number(tile.d.split("span").pop()) >= 2 ? "landscape" : "portrait");
 const IMAGE_MODE_KEY = "image-mode";
 
-// Content filters (נטיב, רימון, NetFree) replace a blocked image with a mosaic of flat colour blocks
-// (3x3 when blocked, 5x5 while "sent for review"), with an icon in the centre. A real photo never has
-// nearly every block perfectly flat, so try each grid size and count the flat blocks.
+// Content filters (נטיב, רימון, NetFree) replace a blocked image with a 3x3 mosaic of flat colour blocks,
+// with an icon in the centre. A real photo never has nearly every block perfectly flat.
+// NetFree shows a 5x5 mosaic while an image is only "sent for review"; those are deliberately left
+// in place (the photographer prefers to wait for approval), so only the 3x3 grid is checked.
 function isMosaic(img: HTMLImageElement) {
   try {
-    const size = 120; // divisible by every grid size below
+    const size = 120;
     const canvas = document.createElement("canvas");
     canvas.width = size;
     canvas.height = size;
@@ -125,7 +126,7 @@ function isMosaic(img: HTMLImageElement) {
       const variance = values.reduce((sum, value) => sum + (value - mean) ** 2, 0) / values.length;
       return Math.sqrt(variance) < 3;
     };
-    return [3, 4, 5, 6].some((grid) => {
+    return [3].some((grid) => {
       const cell = size / grid;
       let flatCells = 0;
       for (let row = 0; row < grid; row++) {

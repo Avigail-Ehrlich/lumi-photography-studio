@@ -621,3 +621,12 @@ a:hover { opacity: .76; }
 /* Hero runs edge to edge; the copy keeps the header's 1500px content edge on wide screens */
 .hero-content { padding-inline-start: max(64px, calc((100vw - 1500px) / 2 + 64px)); }
 @media (max-width: 900px) { .hero-content { padding-inline-start: 20px; } }
+
+/* Hero fills the screen below the 80px header: the photo takes the full height at 3:2 (capped at
+   62% of the width, where it crops slightly at the sides) and the copy takes the rest */
+.hero-grid { grid-template-columns: minmax(0, 1fr) auto; min-height: calc(100svh - 80px); }
+.hero-media { aspect-ratio: auto; height: max(calc(100svh - 80px), 520px); width: min(calc(max(100svh - 80px, 520px) * 1.5), 62vw); }
+@media (max-width: 900px) {
+  .hero-grid { grid-template-columns: 1fr; min-height: 0; }
+  .hero-media { width: 100%; height: auto; aspect-ratio: 3 / 2; }
+}
