@@ -4,9 +4,9 @@ import { useCallback, useEffect, useRef, useState, type CSSProperties } from "re
 import { ArrowLeft, ChevronLeft, ChevronRight, Mail, Phone, Play, Plus, X } from "lucide-react";
 
 const sessions = [
-  { number: "01", id: "family", title: "משפחה", text: "זמן משפחתי רגוע, עם הכוונה עדינה ומקום לכל מה שקורה באמת." },
-  { number: "02", id: "chalake", title: "חלאקה", text: "התספורת הראשונה, הכיפה והציציות — יום מרגש שכדאי לשמור, בבית, בסטודיו או בחוץ." },
-  { number: "03", id: "bat-mitzvah", title: "בת מצווה", text: "צילום אישי שמרגיש בדיוק כמוה — לפני האירוע או ביום עצמו." },
+  { number: "01", id: "family", title: "משפחה", text: "שעה של ביחד, בלי לחץ ובלי פוזות מאולצות. הכוונה עדינה כשצריך, ומקום לכל מה שקורה באמת." },
+  { number: "02", id: "chalake", title: "חלאקה", text: "התלתלים, המספריים, הכיפה הראשונה והציציות החדשות — יום שעובר מהר מדי. בבית, בסטודיו או בחוץ." },
+  { number: "03", id: "bat-mitzvah", title: "בת מצווה", text: "צילום שבונה ביטחון: היא בוחרת את הסגנון, ואני דואגת שתרגיש בנוח ותיראה בדיוק כמו עצמה." },
 ];
 
 type GalleryImage = { src: string; alt: string };
@@ -16,7 +16,7 @@ const galleryCollections: { id: string; label: string; title: string; summary: s
     id: "family",
     label: "משפחה",
     title: "סיפור של בית",
-    summary: "תמונות שמקיימות את הרגעים הכי יומיומיים, שלא אומרים הרבה — אבל נחרטים עמוק.",
+    summary: "האחים, התינוק החדש, הצחוק שלפני ארוחת שבת — מי שיושב סביב השולחן שלכם, בתמונות שתרצו לתלות על הקיר.",
     images: [
       { src: "/images/NF1A1128_%D7%9E%D7%95%D7%A7%D7%98%D7%9F.jpg", alt: "שלושה אחים יחד בעריסת קש" },
       { src: "/images/5X3A6715-2.JPG", alt: "ילדה מחייכת יושבת על ארגז עץ בשדרת עצים" },
@@ -30,7 +30,7 @@ const galleryCollections: { id: string; label: string; title: string; summary: s
     id: "chalake",
     label: "חלאקה",
     title: "התספורת הראשונה",
-    summary: "הרגע שבו התלתלים נגזרים והכיפה עולה — עם כל ההתרגשות, הצחוק והמבטים של מי שמסביב.",
+    summary: "שלוש שנים של תלתלים, רגע אחד של מספריים. ההתרגשות, החיוך הנבוך, והמבט הראשון במראה.",
     images: [
       { src: "/images/hero-family.jpeg", alt: "שני ילדים עם כיפות יושבים על רצפת עץ ואוכלים רימון" },
       { src: "/images/collage/collage-19.jpg", alt: "ילד במשקפי שמש יושב על ספסל עץ ליד אוטובוס צעצוע" },
@@ -41,7 +41,7 @@ const galleryCollections: { id: string; label: string; title: string; summary: s
     id: "bat-mitzvah",
     label: "בת מצווה",
     title: "היא כבר גדולה",
-    summary: "צילום שנותן לה להרגיש בנוח ולהיות היא עצמה — בטבע, בסטודיו או בעיר.",
+    summary: "בגיל הזה כל אחת רוצה להיראות כמו עצמה, רק בגרסה הכי בטוחה. בטבע, בסטודיו או בעיר.",
     images: [],
     youtubeId: "bG3QSC4DuMc",
   },
@@ -162,37 +162,37 @@ function CheckedImage({ src, alt, onBlocked }: { src: string; alt: string; onBlo
 // Placeholder quotes: replace with real testimonials before going live.
 const testimonials = [
   { quote: "הגענו לחוצים, עם שלושה ילדים ותינוק. יצאנו עם תמונות שבהן כולנו נראים בדיוק כמו שאנחנו — רק יפים יותר.", author: "[שם הלקוחה]", type: "צילום משפחה" },
-  { quote: "בחלאקה היה רעש, אורחים והתרגשות. מירית הייתה שם בשקט ותפסה כל רגע, גם את אלה שבכלל לא ראינו.", author: "[שם הלקוחה]", type: "חלאקה" },
+  { quote: "בחלאקה היה רעש, אורחים והתרגשות. היא הייתה שם בשקט ותפסה כל רגע, גם את אלה שבכלל לא ראינו.", author: "[שם הלקוחה]", type: "חלאקה" },
   { quote: "הבת שלי לא אוהבת להצטלם. אחרי עשר דקות היא כבר צחקה, והתמונות יצאו הכי היא שיש.", author: "[שם הלקוחה]", type: "בת מצווה" },
 ];
 
 const faqs = [
-  { q: "איפה מצלמים?", a: "בבית שלכם, בסטודיו או בחוץ — בטבע, בפארק או בכל מקום שיש לו משמעות בשבילכם. את המיקום נבחר יחד בשיחת ההיכרות." },
-  { q: "מה כדאי ללבוש?", a: "בגדים נוחים בגוונים רכים שמתאימים זה לזה, בלי הדפסים גדולים או לוגואים. לפני הצילום אשלח לכם המלצות מפורטות." },
-  { q: "ומה אם הילדים לא ישתפו פעולה?", a: "זה חלק מהעניין. אני לא מבקשת מהם לחייך למצלמה, אלא נותנת להם להיות הם עצמם — ומשם מגיעות התמונות הכי טובות." },
+  { q: "איפה מצלמים?", a: "בבית שלכם, בסטודיו או בחוץ — בפארק, בחורשה או בכל מקום שיש לו משמעות בשבילכם. נבחר יחד בשיחת ההיכרות, לפי האור, העונה והגיל של הילדים." },
+  { q: "מה כדאי ללבוש?", a: "בגדים נוחים בגוונים רכים שמשתלבים זה עם זה, בלי הדפסים גדולים ולוגואים. לפני הצילום תקבלו ממני רשימה מסודרת עם דוגמאות." },
+  { q: "ומה אם הילדים לא ישתפו פעולה?", a: "זה חלק מהתכנון. אני לא מבקשת מהם לחייך למצלמה, אלא נותנת להם זמן, משחק ומרחב — ומשם בדרך כלל מגיעות התמונות הכי יפות." },
   { q: "אפשר לצלם את החלאקה עצמה, באירוע?", a: "כן. אפשר לצלם את התספורת עצמה, בבית או באירוע, וגם סשן נפרד לפני או אחרי — כשהכיפה והציציות עוד חדשות." },
-  { q: "תוך כמה זמן מקבלים את התמונות?", a: "בדרך כלל תוך שבועיים עד שלושה, בגלריה דיגיטלית מסודרת להורדה." },
-  { q: "איך שומרים תאריך?", a: "שולחים פנייה בטופס למטה, נדבר על מה שחשוב לכם ונקבע מועד שמתאים." },
+  { q: "תוך כמה זמן מקבלים את התמונות?", a: "בדרך כלל תוך שבועיים עד שלושה, בגלריה דיגיטלית מסודרת שאפשר להוריד ממנה ולשתף עם כל המשפחה." },
+  { q: "איך שומרים תאריך?", a: "ממלאים את הטופס למטה, ואני חוזרת אליכם לשיחה קצרה. נדבר על מה שחשוב לכם ונקבע מועד. בעונות עמוסות כדאי לפנות מוקדם." },
 ];
 
 const pricingPlans = [
   {
     name: "מיני סשן",
     price: "1,990 ₪",
-    description: "סשן קצר וממוקד, למשפחה קטנה או לילד אחד.",
+    description: "קצר וממוקד: לילד אחד, לשנה הראשונה או למשפחה קטנה.",
     features: ["45 דק' צילום", "20 תמונות ערוכות", "גלריה דיגיטלית להורדה"],
   },
   {
     name: "סשן משפחתי",
     price: "3,490 ₪",
-    description: "צילום משפחה מלא באווירה נינוחה, בבית, בסטודיו או בחוץ.",
+    description: "הבחירה של רוב המשפחות: זמן להתחמם, לשחק ולתת לתמונות הטובות לקרות.",
     features: ["90 דק' צילום", "50+ תמונות ערוכות", "גלריה דיגיטלית מלאה"],
     featured: true,
   },
   {
     name: "חלאקה / בת מצווה",
     price: "5,990 ₪",
-    description: "ליווי של היום המיוחד, מההכנות ועד הרגעים המרגשים.",
+    description: "ליווי מלא של היום המיוחד — מההכנות ועד הרגע שכולם מחכים לו.",
     features: ["שעתיים צילום", "עריכה מלאה", "אלבום מעוצב"],
   },
 ];
@@ -352,8 +352,8 @@ export default function Home() {
         <div className="relative z-10 mx-auto flex min-h-[760px] max-w-[1500px] items-end px-5 pb-20 pt-32 sm:px-10 lg:min-h-screen lg:px-16 lg:pb-24">
           <div className="hero-content max-w-[500px] text-white">
             <p className="eyebrow mb-7">צילום משפחה · חלאקה · בת מצווה</p>
-            <h1 className="display-title">רגעים שמרגישים<br />כמו בית.</h1>
-            <p className="mt-7 max-w-lg text-[1.05rem] leading-8 text-white/85 sm:text-lg">תמונות טבעיות, רכות ומלאות חיים — כאלה שתרצו לחזור אליהן גם בעוד שנים.</p>
+            <h1 className="display-title">הרגעים הקטנים<br />הם הסיפור.</h1>
+            <p className="mt-7 max-w-lg text-[1.05rem] leading-8 text-white/85 sm:text-lg">צילום טבעי ורגוע, באור רך ובקצב של הילדים — תמונות שיישארו הרבה אחרי שהבגדים כבר יהיו קטנים.</p>
             <a href="#portfolio" className="hero-link mt-10 inline-flex items-center gap-3">לצפייה בעבודות <ArrowLeft size={17} strokeWidth={1.5} aria-hidden="true" /></a>
           </div>
         </div>
@@ -368,10 +368,10 @@ export default function Home() {
             <div className="max-w-xl">
               <img src="/images/logo-light.png" alt="MB Photographer" className="about-logo" />
               <p className="eyebrow mt-8 text-[var(--honey-light)]">נעים להכיר</p>
-              <h2 className="section-title mt-5 text-white">אני מצלמת את מה שקורה בין הרגעים.</h2>
+              <h2 className="section-title mt-5 text-white">אני לא מבקשת חיוך. אני מחכה לו.</h2>
               <div className="mt-8 space-y-5 text-base leading-8 text-white/70 sm:text-lg">
-                <p>את הצחוק שמגיע אחרי המבוכה, את הידיים הקטנות, את הדרך שבה אתם מסתכלים זה על זו בלי לשים לב.</p>
-                <p>המטרה שלי היא לא ליצור יום מושלם. היא לשמור עבורכם משהו אמיתי ממנו.</p>
+                <p>צילום טוב מתחיל בסבלנות: לתת לילדים להתרגל, להורים להשתחרר, ולרגע האמיתי להגיע מעצמו — מבט חטוף, יד קטנה שמחפשת יד, צחוק שאי אפשר לביים.</p>
+                <p>אני מביאה עין לאור והרבה שקט. אתם מגיעים כמו שאתם. את השאר נעשה יחד.</p>
               </div>
               <a href="#contact" className="dark-link mt-10 inline-flex items-center gap-3">בואו נכיר <ArrowLeft size={17} strokeWidth={1.5} /></a>
             </div>
@@ -415,7 +415,7 @@ export default function Home() {
       <section id="sessions" className="reveal-section sessions-wrap">
         <div className="mx-auto max-w-[1320px] px-5 py-24 sm:px-10 lg:px-16 lg:py-32">
           <div className="grid gap-12 lg:grid-cols-[0.65fr_1.35fr] lg:gap-24">
-            <div><p className="section-kicker">אפשר לבחור</p><h2 className="section-title mt-4">הצילום שלכם</h2></div>
+            <div><p className="section-kicker">סוגי צילום</p><h2 className="section-title mt-4">מה נצלם יחד?</h2></div>
             <div className="session-list">
               {sessions.map((session) => (
                 <article key={session.number} className="session-item reveal-item">
@@ -492,7 +492,7 @@ export default function Home() {
         <div className="mx-auto max-w-[1400px] px-5 py-24 sm:px-10 lg:px-16 lg:py-32">
           <div className="mb-12 text-center">
             <p className="section-kicker">מה אומרים</p>
-            <h2 className="section-title mt-4">מילים של משפחות</h2>
+            <h2 className="section-title mt-4">משפחות מספרות</h2>
           </div>
           <div className="testimonials-grid">
             {testimonials.map((item, index) => (
@@ -510,7 +510,7 @@ export default function Home() {
         <div className="mx-auto max-w-[1400px] px-5 py-24 sm:px-10 lg:px-16 lg:py-36">
           <div className="mb-12 text-center">
             <p className="section-kicker">מחירון</p>
-            <h2 className="section-title mt-4">חבילות שמתאימות לרגעים שלכם</h2>
+            <h2 className="section-title mt-4">חבילות ברורות, בלי הפתעות</h2>
           </div>
 
           <div className="pricing-grid">
@@ -518,7 +518,7 @@ export default function Home() {
               <article key={plan.name} className={`pricing-card stagger-item ${plan.featured ? "pricing-card-featured" : ""}`} style={{ "--i": index } as CSSProperties}>
                 <div className="pricing-topline">
                   <span className="pricing-name">{plan.name}</span>
-                  {plan.featured && <span className="pricing-badge">פופולרי</span>}
+                  {plan.featured && <span className="pricing-badge">הכי מבוקש</span>}
                 </div>
 
                 <div className="pricing-price">{plan.price}</div>
@@ -556,7 +556,7 @@ export default function Home() {
           <div className="contact-heading">
             <p className="section-kicker">מתחילים מכאן</p>
             <h2 className="contact-title mt-5">יש רגע שאתם רוצים לשמור?</h2>
-            <p className="contact-intro mt-6 max-w-2xl text-base leading-8 sm:text-lg">ספרו לי מי אתם, מה אתם מדמיינים ומתי תרצו להצטלם. משם נבנה יחד חוויה רגועה, אמיתית ומדויקת.</p>
+            <p className="contact-intro mt-6 max-w-2xl text-base leading-8 sm:text-lg">ספרו לי קצת עליכם — מי מצטלם, מה האירוע ומתי. אחזור אליכם עם רעיונות למיקום, לשעה וללבוש, ונבנה יחד צילום שמתאים בדיוק לכם.</p>
           </div>
 
           <div className="contact-panel stagger-item mt-14">
@@ -565,7 +565,7 @@ export default function Home() {
               <div>
                 <p className="contact-aside-kicker">MB PHOTOGRAPHER</p>
                 <h3>בואו נשמור<br />את זה קרוב.</h3>
-                <p className="contact-aside-text">אני חוזרת לכל פנייה באופן אישי, עם כמה שאלות קצרות שיעזרו לנו להבין מה נכון עבורכם.</p>
+                <p className="contact-aside-text">כל פנייה מקבלת ממני תשובה אישית — לא הודעה אוטומטית — עם כמה שאלות קצרות שיעזרו לנו לתכנן נכון.</p>
               </div>
               <div className="contact-details">
                 <a href="mailto:hello@lumi-studio.co"><Mail size={17} strokeWidth={1.5} />hello@lumi-studio.co</a>
