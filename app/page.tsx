@@ -79,7 +79,7 @@ const collageTiles: CollageTile[] = [
 const collageWords = collageTiles.flatMap((tile) => tile.kind === "word" ? [tile.text] : []);
 const collagePhotoTiles = collageTiles.flatMap((tile) => tile.kind === "photo" ? [tile] : []);
 
-const HERO_SRC = "/images/hero-family.jpeg";
+const HERO_SRC = "/images/hero-sisters.jpg";
 const ABOUT_SRC = "/images/NF1A1128_%D7%9E%D7%95%D7%A7%D7%98%D7%9F.jpg";
 
 // Images that pass the common Israeli content filters (checked by the photographer on a filtered line).
@@ -355,7 +355,7 @@ export default function Home() {
             <a href="#portfolio" className="hero-link mt-10 inline-flex items-center gap-3">לצפייה בעבודות <ArrowLeft size={17} strokeWidth={1.5} aria-hidden="true" /></a>
           </div>
           <div className="hero-media">
-            <div className={`hero-photo ${isBlocked(HERO_SRC) ? "is-filtered" : ""}`} role="img" aria-label="שני ילדים עם כיפות יושבים על רצפת עץ ואוכלים רימון" />
+            <div className={`hero-photo ${isBlocked(HERO_SRC) ? "is-filtered" : ""}`} role="img" aria-label="שתי אחיות בכובעים מחייכות בין חבילות קש" />
           </div>
         </div>
       </section>

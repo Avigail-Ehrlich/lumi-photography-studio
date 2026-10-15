@@ -91,7 +91,7 @@ a:hover { opacity: .76; }
 .hero-photo {
   position: absolute;
   inset: 0;
-  background-image: url("/images/hero-family.jpeg");
+  background-image: url("/images/hero-sisters.jpg");
   background-size: cover;
   background-position: center;
   filter: saturate(0.7) contrast(1.05);
