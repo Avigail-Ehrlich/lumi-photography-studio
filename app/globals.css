@@ -347,8 +347,8 @@ a:hover { opacity: .76; }
 .contact-aside h3 { margin: 0; font-family: var(--font-serif); font-size: clamp(2.7rem, 4vw, 5rem); line-height: 1.08; font-weight: 400; letter-spacing: -.01em; }
 .contact-aside-text { max-width: 30ch; margin: 26px 0 0; color: rgba(255,255,255,.68); line-height: 1.9; }
 .contact-details { display: grid; gap: 14px; }
-.contact-details a { display: inline-flex; align-items: center; gap: 10px; color: rgba(255,255,255,.78); font-size: .9rem; text-decoration: none; direction: ltr; justify-content: flex-end; }
-.contact-details a svg { direction: rtl; }
+.contact-details > a, .contact-details > span { display: inline-flex; align-items: center; gap: 10px; color: rgba(255,255,255,.78); font-size: .9rem; text-decoration: none; direction: ltr; justify-content: flex-end; }
+.contact-details > a svg, .contact-details > span svg { direction: rtl; }
 .contact-card, .contact-form {
   background: rgba(255,255,255,0.2);
   border: 1px solid rgba(92,74,58, 0.18);

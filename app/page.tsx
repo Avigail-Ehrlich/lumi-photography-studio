@@ -368,10 +368,10 @@ export default function Home() {
             <div className="max-w-xl">
               <img src="/images/logo-light.png" alt="MB Photographer" className="about-logo" />
               <p className="eyebrow mt-8 text-[var(--honey-light)]">נעים להכיר</p>
-              <h2 className="section-title mt-5 text-white">אני לא מבקשת חיוך. אני מחכה לו.</h2>
+              <h2 className="section-title mt-5 text-white">היי, אני מירית.</h2>
               <div className="mt-8 space-y-5 text-base leading-8 text-white/70 sm:text-lg">
-                <p>צילום טוב מתחיל בסבלנות: לתת לילדים להתרגל, להורים להשתחרר, ולרגע האמיתי להגיע מעצמו — מבט חטוף, יד קטנה שמחפשת יד, צחוק שאי אפשר לביים.</p>
-                <p>אני מביאה עין לאור והרבה שקט. אתם מגיעים כמו שאתם. את השאר נעשה יחד.</p>
+                <p>מאחורי המצלמה של MB Photographer עומדת אני. אני מצלמת משפחות, חלאקות ובנות מצווה, ומלווה כל משפחה מהשיחה הראשונה ועד שהתמונות מגיעות אליה הביתה.</p>
+                <p>הכי חשוב לי שתרגישו בנוח. אני לא מבקשת מאף אחד לחייך — אני נותנת לילדים להתרגל, להורים להשתחרר, ומחכה לרגע האמיתי שמגיע מעצמו.</p>
               </div>
               <a href="#contact" className="dark-link mt-10 inline-flex items-center gap-3">בואו נכיר <ArrowLeft size={17} strokeWidth={1.5} /></a>
             </div>
@@ -568,7 +568,8 @@ export default function Home() {
                 <p className="contact-aside-text">כל פנייה מקבלת ממני תשובה אישית — לא הודעה אוטומטית — עם כמה שאלות קצרות שיעזרו לנו לתכנן נכון.</p>
               </div>
               <div className="contact-details">
-                <a href="mailto:mirelmark2@gmail.com"><Mail size={17} strokeWidth={1.5} /><span dir="ltr">mirelmark2@gmail.com</span></a>
+                {/* Shown only for now: not a mailto link until the site goes live */}
+                <span><Mail size={17} strokeWidth={1.5} /><span dir="ltr">mirelmark2@gmail.com</span></span>
                 <a href="tel:+972548520516"><Phone size={17} strokeWidth={1.5} /><span dir="ltr">054-8520516</span></a>
               </div>
             </aside>
