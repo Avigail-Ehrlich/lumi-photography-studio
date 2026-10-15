@@ -162,7 +162,7 @@ function CheckedImage({ src, alt, onBlocked }: { src: string; alt: string; onBlo
 // Placeholder quotes: replace with real testimonials before going live.
 const testimonials = [
   { quote: "הגענו לחוצים, עם שלושה ילדים ותינוק. יצאנו עם תמונות שבהן כולנו נראים בדיוק כמו שאנחנו — רק יפים יותר.", author: "[שם הלקוחה]", type: "צילום משפחה" },
-  { quote: "בחלאקה היה רעש, אורחים והתרגשות. היא הייתה שם בשקט ותפסה כל רגע, גם את אלה שבכלל לא ראינו.", author: "[שם הלקוחה]", type: "חלאקה" },
+  { quote: "בחלאקה היה רעש, אורחים והתרגשות. מירית הייתה שם בשקט ותפסה כל רגע, גם את אלה שבכלל לא ראינו.", author: "[שם הלקוחה]", type: "חלאקה" },
   { quote: "הבת שלי לא אוהבת להצטלם. אחרי עשר דקות היא כבר צחקה, והתמונות יצאו הכי היא שיש.", author: "[שם הלקוחה]", type: "בת מצווה" },
 ];
 
@@ -342,7 +342,7 @@ export default function Home() {
           <nav className="header-nav hidden items-center gap-7 text-sm lg:flex" aria-label="ניווט ראשי">
             <a href="#portfolio">עבודות</a><a href="#sessions">סוגי צילום</a><a href="#about">אודות</a><a href="#testimonials">המלצות</a><a href="#pricing">מחירון</a><a href="#faq">שאלות</a><a href="#contact">יצירת קשר</a>
           </nav>
-          <a href="#contact" className="header-cta">לתיאום צילום</a>
+          <a href="tel:+972548520516" className="header-cta">לתיאום צילום: מירית <span dir="ltr">054-8520516</span></a>
         </div>
       </header>
 
@@ -569,7 +569,7 @@ export default function Home() {
               </div>
               <div className="contact-details">
                 <a href="mailto:hello@lumi-studio.co"><Mail size={17} strokeWidth={1.5} />hello@lumi-studio.co</a>
-                <a href="tel:+9720500000000"><Phone size={17} strokeWidth={1.5} />+972 050-000-0000</a>
+                <a href="tel:+972548520516"><Phone size={17} strokeWidth={1.5} /><span dir="ltr">054-8520516</span></a>
               </div>
             </aside>
 
