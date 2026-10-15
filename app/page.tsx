@@ -2,6 +2,9 @@
 
 import { useCallback, useEffect, useRef, useState, type CSSProperties } from "react";
 import { ArrowLeft, ChevronLeft, ChevronRight, Mail, Phone, Play, Plus, X } from "lucide-react";
+import { A11yMenu, SkipLinks } from "@/components/a11y-controls";
+import { AccessibilityStatement, PrivacyPolicy } from "@/components/legal-content";
+import { LegalDialog } from "@/components/legal-dialog";
 
 const sessions = [
   { number: "01", id: "family", title: "משפחה", text: "שעה של ביחד, בלי לחץ ובלי פוזות מאולצות. הכוונה עדינה כשצריך, ומקום לכל מה שקורה באמת." },
@@ -351,6 +354,7 @@ export default function Home() {
 
   return (
     <main dir="rtl" className="overflow-hidden bg-[var(--cream)] text-[var(--ink)]">
+      <SkipLinks />
       <header className="relative z-20 border-b border-[var(--line)] bg-[var(--cream)] text-[var(--ink)]">
         <div className="mx-auto flex h-20 max-w-[1500px] items-center justify-between px-5 sm:px-10 lg:px-16">
           <a href="#top" className="brand-logo brand-logo-header" aria-label="MB Photographer — דף הבית"><img src="/images/logo-light.png" alt="MB Photographer" /></a>
@@ -602,14 +606,23 @@ export default function Home() {
         </div>
       </section>
 
-      <footer className="bg-[var(--espresso-deep)] text-white/70">
-        <div className="mx-auto flex max-w-[1500px] flex-col items-center justify-between gap-7 px-5 py-10 text-sm sm:px-10 md:flex-row lg:px-16">
-          <a href="#top" className="brand-logo brand-logo-footer" aria-label="MB Photographer — חזרה לראש העמוד"><img src="/images/logo-light.png" alt="MB Photographer" /></a><p>צילום משפחה · חלאקה · בת מצווה</p><p dir="ltr">© 2026 MB PHOTOGRAPHER</p>
-        </div>
-        <div className="credit-bar">
-          <p className="credit-bar-inner">
-            האתר עוצב ונבנה ע״י
-            <a href="https://ajenda-studio.ajendastudio.workers.dev/" target="_blank" rel="noopener noreferrer" className="credit-mark" dir="ltr">AJ<span>enda</span> Studio</a>
+      <footer className="site-footer">
+        <div className="footer-inner mx-auto max-w-[1500px] px-5 sm:px-10 lg:px-16">
+          <a href="#top" className="brand-logo brand-logo-footer" aria-label="MB Photographer — חזרה לראש העמוד"><img src="/images/logo-light.png" alt="MB Photographer" /></a>
+          <div className="footer-legal">
+            <A11yMenu />
+            <span aria-hidden="true">|</span>
+            <LegalDialog label="הצהרת נגישות" title="הצהרת נגישות"><AccessibilityStatement /></LegalDialog>
+            <span aria-hidden="true">|</span>
+            <LegalDialog label="מדיניות פרטיות" title="מדיניות פרטיות"><PrivacyPolicy /></LegalDialog>
+          </div>
+          <p className="footer-rights">
+            <span>© 2026 MB Photographer. כל הזכויות שמורות</span>
+            <span aria-hidden="true">|</span>
+            <span className="footer-credit">
+              עיצוב ובנייה -
+              <a href="https://ajenda-studio.ajendastudio.workers.dev" target="_blank" rel="noopener" className="studio-mark" dir="ltr" aria-label="AJenda Studio — עיצוב ובניית אתרים"><span className="br">{"{"}</span>AJ<span className="br">{"}"}</span>enda</a>
+            </span>
           </p>
         </div>
       </footer>

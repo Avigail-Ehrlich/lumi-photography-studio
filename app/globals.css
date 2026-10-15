@@ -78,12 +78,19 @@ a:hover { opacity: .76; }
 
 .header-cta { border: 1px solid rgba(46,38,32,.35); padding: 10px 16px; font-size: .82rem; transition: transform .25s ease, background-color .25s ease, color .25s ease, box-shadow .25s ease; }
 
-.credit-bar { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: center; gap: 8px 28px; padding: 16px 5%; border-top: 1px solid rgba(255,255,255,.08); background: #171310; font-size: .74rem; color: rgba(255,255,255,.45); }
-.credit-bar-inner { display: flex; align-items: baseline; gap: 8px; margin: 0; text-align: center; }
-.credit-mark { font-family: Georgia, "Times New Roman", serif; font-size: 1rem; letter-spacing: .06em; color: rgba(255,255,255,.72); }
-.credit-mark span { color: var(--honey-light); }
-a.credit-mark { text-decoration: none; transition: color .2s ease; }
-a.credit-mark:hover, a.credit-mark:focus-visible { color: #fff; }
+/* Footer: one row (logo | legal links | rights + studio credit); stacked and centred on mobile */
+.site-footer { background: var(--espresso-deep); color: rgba(255,255,255,.6); font-size: .85rem; }
+.footer-inner { display: flex; flex-direction: column; align-items: center; gap: 16px; padding-block: 28px; text-align: center; }
+.footer-legal, .footer-rights { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 6px 12px; margin: 0; }
+.footer-link { padding: 0; border: 0; background: none; color: inherit; font: inherit; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
+.footer-link:hover { color: #fff; }
+.footer-credit { display: inline-flex; align-items: baseline; gap: 6px; }
+.studio-mark { font-family: "JetBrains Mono", "Cascadia Code", Consolas, monospace; font-weight: 700; letter-spacing: -.02em; color: inherit; text-decoration: none; }
+.studio-mark .br { color: var(--honey-light); font-weight: 500; }
+a.studio-mark:hover, a.studio-mark:focus-visible { color: #fff; opacity: 1; }
+@media (min-width: 900px) { .footer-inner { flex-direction: row; justify-content: space-between; } }
+/* On narrow screens rights and credit stack, so the divider between them would hang alone */
+@media (max-width: 899px) { .footer-rights { flex-direction: column; } .footer-rights > [aria-hidden] { display: none; } }
 .header-cta:hover { opacity: 1; transform: translateY(-3px); background: var(--espresso); color: white; box-shadow: 0 10px 22px rgba(0,0,0,.18); }
 .hero-section { position: relative; background: var(--cream); }
 /* Split hero: copy on the right, the photo on the left at its own 3:2 ratio so nothing is cropped or covered */
@@ -637,3 +644,38 @@ img[data-checked] { transition: opacity .7s ease, transform 1.2s cubic-bezier(.2
 img[data-checked]:not(.is-ready) { opacity: 0 !important; }
 .hero-photo.is-ready { opacity: 1; animation: heroDevelop 2.4s cubic-bezier(.2,.6,.2,1) both; }
 .about-photo-image:not(.is-ready) { opacity: 0; }
+
+/* Legal + accessibility dialogs: narrow, centred, scrolls inside */
+.legal-dialog { position: fixed; inset: 0; margin: auto; width: min(440px, calc(100vw - 32px)); height: fit-content; max-height: 70vh; overflow-y: auto; padding: 0; border: 0; border-radius: 0; background: var(--paper); color: var(--ink); font-family: var(--font-body); text-align: right; box-shadow: 0 30px 60px rgba(31,25,21,.3); }
+.legal-dialog::backdrop { background: rgba(31,25,21,.6); }
+.legal-dialog-head { position: sticky; top: 0; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 18px; border-bottom: 1px solid var(--line); background: var(--paper); }
+.legal-dialog-head h2 { margin: 0; font-size: 1.05rem; font-weight: 600; }
+.legal-close { display: grid; place-items: center; padding: 4px; border: 0; background: none; color: var(--muted-text); cursor: pointer; }
+.legal-close:hover { color: var(--ink); }
+.legal { padding: 14px 18px 20px; font-size: .85rem; line-height: 1.6; }
+.legal-updated { color: var(--muted-text); font-size: .78rem; }
+.legal h3 { margin: 18px 0 6px; font-size: .95rem; font-weight: 600; color: var(--ink); }
+.legal p, .legal ul { margin: 0 0 14px; color: var(--muted-text); }
+.legal ul { padding-inline-start: 22px; list-style: disc; }
+.legal li { margin-bottom: 6px; }
+.legal a { color: var(--honey-text); text-decoration: underline; text-underline-offset: 3px; }
+
+/* Accessibility: always-on keyboard support */
+:where(a, button, input, textarea, select, summary, [tabindex]):focus-visible { outline: 3px solid var(--honey); outline-offset: 2px; }
+.skip-links { position: fixed; top: 8px; right: 8px; z-index: 110; display: flex; gap: 8px; }
+.skip-link { position: absolute; right: 0; padding: 10px 16px; border: 0; border-radius: 0; background: var(--ink); color: #fff; font: inherit; font-size: .95rem; white-space: nowrap; cursor: pointer; transform: translateY(-200%); }
+.skip-link:focus { position: static; transform: none; }
+
+/* Accessibility: visitor adjustments (footer panel), classes set on <html> by lib/a11y.ts */
+html.a11y-big { font-size: 118%; }
+html.a11y-big body { font-size: 20px; }
+html.a11y-links a { text-decoration: underline !important; text-underline-offset: 3px; }
+html.a11y-still { scroll-behavior: auto; }
+html.a11y-still *, html.a11y-still *::before, html.a11y-still *::after { transition-duration: .01ms !important; transition-delay: 0s !important; animation-duration: .01ms !important; animation-delay: 0s !important; animation-iteration-count: 1 !important; }
+.a11y-options { display: grid; gap: 8px; padding: 16px 18px 20px; }
+.a11y-option { padding: 11px 14px; border: 1px solid var(--line); border-radius: 0; background: var(--paper); color: var(--ink); font: inherit; font-size: .92rem; text-align: right; cursor: pointer; }
+.a11y-option:hover { border-color: var(--muted-text); }
+.a11y-option[aria-pressed="true"] { border-color: var(--espresso); background: var(--espresso); color: #fff; }
+.a11y-option[aria-pressed="true"]::after { content: " ✓"; }
+.a11y-reset { justify-self: start; margin-top: 4px; padding: 4px 0; border: 0; background: none; color: var(--muted-text); font: inherit; font-size: .85rem; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
+.a11y-reset:disabled { opacity: .45; cursor: default; }
