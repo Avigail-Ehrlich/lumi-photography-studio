@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, type CSSProperties } from "react";
+import { useCallback, useEffect, useRef, useState, type CSSProperties } from "react";
 import { ArrowLeft, ChevronLeft, ChevronRight, Mail, Phone, Play, Plus, X } from "lucide-react";
 
 const sessions = [
@@ -77,98 +77,83 @@ const collageTiles: CollageTile[] = [
 
 // Words are written one after another, in this order
 const collageWords = collageTiles.flatMap((tile) => tile.kind === "word" ? [tile.text] : []);
-const photosOf = (tiles: CollageTile[]) => tiles.flatMap((tile) => tile.kind === "photo" ? [{ src: tile.src, alt: tile.alt }] : []);
+const collagePhotoTiles = collageTiles.flatMap((tile) => tile.kind === "photo" ? [tile] : []);
+
+const HERO_SRC = "/images/hero-family.jpeg";
+const ABOUT_SRC = "/images/NF1A1128_%D7%9E%D7%95%D7%A7%D7%98%D7%9F.jpg";
 
 // Images that pass the common Israeli content filters (checked by the photographer on a filtered line).
-// When a filter is detected, the site shows only these.
-const FILTER_SAFE_IMAGES = new Set([
-  "/images/collage/collage-07.jpg",
-  "/images/collage/collage-10.jpg",
-  "/images/collage/collage-19.jpg",
-  "/images/5X3A6715-2.JPG",
-  "/images/צילום%20שיפי%200548517049%20%2813%29.jpg",
-]);
-
-const safeTile = (src: string) => {
-  const tile = collageTiles.find((item) => item.kind === "photo" && item.src === src);
-  if (!tile || tile.kind !== "photo") throw new Error(`Missing collage photo ${src}`);
-  return tile;
-};
-
-// Collage built only from FILTER_SAFE_IMAGES: 6 cols x 4 rows on desktop, 2 cols x 6 rows on mobile.
-const filteredCollageTiles: CollageTile[] = [
-  { ...safeTile("/images/collage/collage-07.jpg"), d: "1 / 1 / span 2 / span 2", m: "1 / 1", order: 0 },
-  { ...safeTile("/images/collage/collage-10.jpg"), d: "1 / 3 / span 2 / span 1", m: "1 / 2 / span 2", order: 2 },
-  { kind: "word", text: "משפחה", d: "1 / 4 / span 2 / span 1", m: "2 / 1", order: 6 },
-  { ...safeTile("/images/collage/collage-19.jpg"), d: "1 / 5 / span 2 / span 2", m: "3 / 2", order: 1 },
-  { ...safeTile("/images/צילום%20שיפי%200548517049%20%2813%29.jpg"), d: "3 / 1 / span 2 / span 1", m: "3 / 1 / span 2", order: 3 },
-  { kind: "word", text: "אהבה", d: "3 / 2 / span 2 / span 2", m: "4 / 2", order: 7 },
-  { ...safeTile("/images/5X3A6715-2.JPG"), d: "3 / 4 / span 2 / span 1", m: "5 / 2 / span 2", order: 4 },
-  { kind: "word", text: "שמחה", d: "3 / 5 / span 2 / span 1", m: "5 / 1", order: 8 },
-  { kind: "link", d: "3 / 6 / span 2 / span 1", m: "6 / 1", order: 5 },
+// Any image the viewer's filter blocks is swapped in place for one of these; repeats are fine for now.
+type Shape = "portrait" | "landscape";
+const FILTER_SAFE_IMAGES: { src: string; shape: Shape }[] = [
+  { src: "/images/collage/collage-07.jpg", shape: "landscape" },
+  { src: "/images/collage/collage-10.jpg", shape: "portrait" },
+  { src: "/images/collage/collage-19.jpg", shape: "landscape" },
+  { src: "/images/5X3A6715-2.JPG", shape: "portrait" },
+  { src: "/images/צילום%20שיפי%200548517049%20%2813%29.jpg", shape: "portrait" },
 ];
-
-// Images the photographer's filter is known to block; if either comes back blocked, switch to filtered mode.
-const FILTER_PROBES = ["/images/collage/collage-11.jpg", "/images/collage/collage-17.jpg"];
+const isFilterSafe = (src: string) => FILTER_SAFE_IMAGES.some((image) => image.src === src);
+const safeImageAlt = (src: string) => collagePhotoTiles.find((tile) => tile.src === src)?.alt ?? "";
+// A collage slot spanning two or more desktop columns is landscape
+const collageShapes = collagePhotoTiles.map((tile): Shape => Number(tile.d.split("span").pop()) >= 2 ? "landscape" : "portrait");
 const IMAGE_MODE_KEY = "image-mode";
-const FILTER_DETECTED_KEY = "filter-detected";
 
 // Content filters (נטיב, רימון וכו') replace a blocked image with a 3x3 mosaic of flat colour blocks,
 // with a "blocked" icon in the centre block. A real photo never has eight perfectly flat regions.
+function isMosaic(img: HTMLImageElement) {
+  try {
+    const size = 60;
+    const cell = size / 3;
+    const canvas = document.createElement("canvas");
+    canvas.width = size;
+    canvas.height = size;
+    const ctx = canvas.getContext("2d", { willReadFrequently: true });
+    if (!ctx) return false;
+    ctx.drawImage(img, 0, 0, size, size);
+    const { data } = ctx.getImageData(0, 0, size, size);
+    let flatCells = 0;
+    for (let row = 0; row < 3; row++) {
+      for (let col = 0; col < 3; col++) {
+        if (row === 1 && col === 1) continue;
+        const values: number[] = [];
+        // Sample the inside of the block, away from the edges where JPEG blends neighbours
+        for (let y = row * cell + 5; y < (row + 1) * cell - 5; y++) {
+          for (let x = col * cell + 5; x < (col + 1) * cell - 5; x++) {
+            const i = (y * size + x) * 4;
+            values.push(data[i] * 0.3 + data[i + 1] * 0.59 + data[i + 2] * 0.11);
+          }
+        }
+        const mean = values.reduce((sum, value) => sum + value, 0) / values.length;
+        const variance = values.reduce((sum, value) => sum + (value - mean) ** 2, 0) / values.length;
+        if (Math.sqrt(variance) < 3) flatCells++;
+      }
+    }
+    return flatCells === 8;
+  } catch {
+    return false;
+  }
+}
+
+// For CSS background images (hero, about), which have no <img> to inspect
 function isImageBlocked(src: string): Promise<boolean> {
   return new Promise((resolve) => {
     const img = new Image();
-    const timeout = window.setTimeout(() => resolve(false), 6000);
-    img.onerror = () => { window.clearTimeout(timeout); resolve(true); };
-    img.onload = () => {
-      window.clearTimeout(timeout);
-      try {
-        const size = 60;
-        const cell = size / 3;
-        const canvas = document.createElement("canvas");
-        canvas.width = size;
-        canvas.height = size;
-        const ctx = canvas.getContext("2d", { willReadFrequently: true });
-        if (!ctx) return resolve(false);
-        ctx.drawImage(img, 0, 0, size, size);
-        const { data } = ctx.getImageData(0, 0, size, size);
-        let flatCells = 0;
-        for (let row = 0; row < 3; row++) {
-          for (let col = 0; col < 3; col++) {
-            if (row === 1 && col === 1) continue;
-            const values: number[] = [];
-            // Sample the inside of the block, away from the edges where JPEG blends neighbours
-            for (let y = row * cell + 5; y < (row + 1) * cell - 5; y++) {
-              for (let x = col * cell + 5; x < (col + 1) * cell - 5; x++) {
-                const i = (y * size + x) * 4;
-                values.push(data[i] * 0.3 + data[i + 1] * 0.59 + data[i + 2] * 0.11);
-              }
-            }
-            const mean = values.reduce((sum, value) => sum + value, 0) / values.length;
-            const variance = values.reduce((sum, value) => sum + (value - mean) ** 2, 0) / values.length;
-            if (Math.sqrt(variance) < 3) flatCells++;
-          }
-        }
-        resolve(flatCells === 8);
-      } catch {
-        resolve(false);
-      }
-    };
+    img.onerror = () => resolve(true);
+    img.onload = () => resolve(isMosaic(img));
     img.src = src;
   });
 }
 
-// A manual choice (footer toggle) wins; otherwise probe once per visit for a content filter.
-async function resolveFilteredMode() {
-  const read = (storage: () => Storage, key: string) => { try { return storage().getItem(key); } catch { return null; } };
-  const manual = read(() => localStorage, IMAGE_MODE_KEY);
-  if (manual) return manual === "filtered";
-  const detected = read(() => sessionStorage, FILTER_DETECTED_KEY);
-  if (detected) return detected === "1";
-
-  const blocked = (await Promise.all(FILTER_PROBES.map(isImageBlocked))).some(Boolean);
-  try { sessionStorage.setItem(FILTER_DETECTED_KEY, blocked ? "1" : "0"); } catch {}
-  return blocked;
+// An <img> that reports when the viewer's content filter blocked it
+function CheckedImage({ src, alt, onBlocked }: { src: string; alt: string; onBlocked: (src: string) => void }) {
+  const ref = useRef<HTMLImageElement>(null);
+  const check = useCallback(() => {
+    const img = ref.current;
+    if (img && (img.naturalWidth === 0 || isMosaic(img))) onBlocked(src);
+  }, [src, onBlocked]);
+  // The image may have finished loading before hydration attached onLoad
+  useEffect(() => { if (ref.current?.complete) check(); }, [check]);
+  return <img ref={ref} src={src} alt={alt} loading="lazy" onLoad={check} onError={() => onBlocked(src)} />;
 }
 
 // Placeholder quotes: replace with real testimonials before going live.
@@ -274,17 +259,43 @@ export default function Home() {
   const [activeTab, setActiveTab] = useState(galleryCollections[0].id);
   const [lightbox, setLightbox] = useState<{ images: GalleryImage[]; index: number } | null>(null);
   const activeCollection = galleryCollections.find((collection) => collection.id === activeTab) ?? galleryCollections[0];
+  // `filtered` is the manual footer toggle: treat every image outside the safe set as blocked.
   const [filtered, setFiltered] = useState(false);
-  const galleryImages = filtered ? activeCollection.images.filter((image) => FILTER_SAFE_IMAGES.has(image.src)) : activeCollection.images;
-  const placeholderCount = filtered ? 0 : Math.max(0, MIN_GALLERY_TILES - galleryImages.length);
-  const activeCollageTiles = filtered ? filteredCollageTiles : collageTiles;
-  const collagePhotos = photosOf(activeCollageTiles);
+  const [blockedImages, setBlockedImages] = useState<ReadonlySet<string>>(() => new Set());
+  const markBlocked = useCallback((src: string) => setBlockedImages((current) => current.has(src) ? current : new Set(current).add(src)), []);
+  const isBlocked = (src: string) => blockedImages.has(src) || (filtered && !isFilterSafe(src));
+  const availableSafe = FILTER_SAFE_IMAGES.filter((image) => !blockedImages.has(image.src));
+  // Blocked images are swapped in place for a safe image of the same shape, rotating through them
+  const replaceBlocked = (images: GalleryImage[], shapes?: Shape[]) => {
+    const used: Record<string, number> = {};
+    return images.map((image, slot): GalleryImage => {
+      if (!isBlocked(image.src)) return image;
+      const shape = shapes?.[slot];
+      const sameShape = availableSafe.filter((safe) => safe.shape === shape);
+      const candidates = sameShape.length > 0 ? sameShape : availableSafe;
+      if (candidates.length === 0) return image;
+      const turn = used[shape ?? "any"] = (used[shape ?? "any"] ?? 0) + 1;
+      const src = candidates[turn % candidates.length].src;
+      return { src, alt: safeImageAlt(src) };
+    });
+  };
+
+  const galleryImages = replaceBlocked(activeCollection.images);
+  const placeholderCount = Math.max(0, MIN_GALLERY_TILES - galleryImages.length);
+  const collagePhotos = replaceBlocked(collagePhotoTiles, collageShapes);
 
   useEffect(() => {
     let cancelled = false;
-    resolveFilteredMode().then((value) => { if (!cancelled) setFiltered(value); });
+    (async () => {
+      let manual: string | null = null;
+      try { manual = localStorage.getItem(IMAGE_MODE_KEY); } catch {}
+      if (manual === "filtered" && !cancelled) setFiltered(true);
+      for (const src of [HERO_SRC, ABOUT_SRC]) {
+        if (await isImageBlocked(src) && !cancelled) markBlocked(src);
+      }
+    })();
     return () => { cancelled = true; };
-  }, []);
+  }, [markBlocked]);
 
   const toggleFiltered = () => {
     const next = !filtered;
@@ -333,7 +344,7 @@ export default function Home() {
       </header>
 
       <section id="top" className="hero-section">
-        <div className="hero-photo" role="img" aria-label="שני ילדים עם כיפות יושבים על רצפת עץ ואוכלים רימון" />
+        <div className={`hero-photo ${isBlocked(HERO_SRC) ? "is-filtered" : ""}`} role="img" aria-label="שני ילדים עם כיפות יושבים על רצפת עץ ואוכלים רימון" />
         <div className="hero-shade" />
         <div className="relative z-10 mx-auto flex min-h-[760px] max-w-[1500px] items-end px-5 pb-20 pt-32 sm:px-10 lg:min-h-screen lg:px-16 lg:pb-24">
           <div className="hero-content max-w-[500px] text-white">
@@ -351,8 +362,8 @@ export default function Home() {
             <p className="section-kicker">השראה</p>
             <h2 className="section-title mt-4">לתפוס את הרגע</h2>
           </div>
-          <div key={filtered ? "filtered" : "full"} className="collage">
-            {activeCollageTiles.map((tile) => {
+          <div className="collage">
+            {collageTiles.map((tile) => {
               const style = { "--area-d": tile.d, "--area-m": tile.m, "--order": tile.order } as CSSProperties;
               if (tile.kind === "word") {
                 const wordStyle = { ...style, "--word": collageWords.indexOf(tile.text) } as CSSProperties;
@@ -366,10 +377,11 @@ export default function Home() {
                   </a>
                 );
               }
-              const index = collagePhotos.findIndex((photo) => photo.src === tile.src);
+              const slot = collagePhotoTiles.indexOf(tile);
+              const photo = collagePhotos[slot];
               return (
-                <button key={tile.src} type="button" className="collage-tile collage-photo" style={style} onClick={() => setLightbox({ images: collagePhotos, index })} aria-label={`הגדלת התמונה: ${tile.alt}`}>
-                  <img src={tile.src} alt={tile.alt} loading="lazy" />
+                <button key={tile.src} type="button" className="collage-tile collage-photo" style={style} onClick={() => setLightbox({ images: collagePhotos, index: slot })} aria-label={`הגדלת התמונה: ${photo.alt}`}>
+                  <CheckedImage src={photo.src} alt={photo.alt} onBlocked={markBlocked} />
                 </button>
               );
             })}
@@ -442,8 +454,8 @@ export default function Home() {
 
             <div className="gallery-masonry">
               {galleryImages.map((image, index) => (
-                <button key={image.src} type="button" className="gallery-tile" onClick={() => setLightbox({ images: galleryImages, index })} aria-label={`הגדלת התמונה: ${image.alt}`}>
-                  <img src={image.src} alt={image.alt} loading="lazy" />
+                <button key={`${activeCollection.id}-${index}`} type="button" className="gallery-tile" onClick={() => setLightbox({ images: galleryImages, index })} aria-label={`הגדלת התמונה: ${image.alt}`}>
+                  <CheckedImage src={image.src} alt={image.alt} onBlocked={markBlocked} />
                   <span className="gallery-tile-zoom" aria-hidden="true"><Plus size={20} strokeWidth={1.25} /></span>
                 </button>
               ))}
@@ -464,7 +476,7 @@ export default function Home() {
       <section id="about" className="reveal-section bg-[var(--espresso)] text-white">
         <div className="mx-auto grid max-w-[1500px] lg:grid-cols-2">
           <div className="about-photo relative min-h-[520px] lg:min-h-[760px]">
-            <div className={`about-photo-image ${filtered ? "is-filtered" : ""}`} role="img" aria-label="תמונת מצלמת צילום משפחה" />
+            <div className={`about-photo-image ${isBlocked(ABOUT_SRC) ? "is-filtered" : ""}`} role="img" aria-label="תמונת מצלמת צילום משפחה" />
           </div>
           <div className="reveal-copy flex items-center px-6 py-20 sm:px-14 lg:px-20 lg:py-24">
             <div className="max-w-xl">

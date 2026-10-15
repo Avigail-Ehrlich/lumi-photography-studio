@@ -588,6 +588,7 @@ a:hover { opacity: .76; }
 
 /* Filtered-internet mode (see FILTER_SAFE_IMAGES in page.tsx) */
 .about-photo-image.is-filtered { background-image: url("/images/collage/collage-07.jpg"); }
+.hero-photo.is-filtered { background-image: url("/images/collage/collage-19.jpg"); }
 .filter-toggle { padding: 0; border: 0; border-bottom: 1px solid rgba(255,255,255,.25); background: none; color: inherit; font: inherit; cursor: pointer; transition: color .2s ease, border-color .2s ease; }
 .filter-toggle:hover, .filter-toggle:focus-visible, .filter-toggle[aria-pressed="true"] { color: var(--honey-light); border-color: currentColor; }
 .collage-link span { text-align: center; }
