@@ -562,7 +562,6 @@ export default function Home() {
 
           <div className="contact-panel stagger-item mt-14">
             <aside className="contact-aside">
-              <span className="contact-aside-number">M / 01</span>
               <div>
                 <p className="contact-aside-kicker">MB PHOTOGRAPHER</p>
                 <h3>בואו נשמור<br />את זה קרוב.</h3>
@@ -576,13 +575,11 @@ export default function Home() {
             </aside>
 
             <form className="contact-form">
-              <div className="contact-form-header"><span>01 — פרטים</span><span>נשמור על קשר</span></div>
               <div className="field-row">
                 <label><span>שם מלא</span><input type="text" placeholder="איך קוראים לכם?" /></label>
                 <label><span>טלפון</span><input type="tel" placeholder="050-0000000" /></label>
               </div>
               <label><span>אימייל</span><input type="email" placeholder="your@email.com" /></label>
-              <label><span>סוג הצילום</span><select defaultValue=""><option value="" disabled>מה תרצו לצלם?</option><option value="family">משפחה</option><option value="chalake">חלאקה</option><option value="bat-mitzvah">בת מצווה</option><option value="other">אחר</option></select></label>
               <label><span>כמה מילים</span><textarea rows={4} placeholder="ספרו לי על הרגע שתרצו לשמור..." /></label>
               <button type="submit" className="submit-button">שליחת פנייה <ArrowLeft size={17} strokeWidth={1.5} /></button>
             </form>
