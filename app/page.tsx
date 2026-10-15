@@ -23,6 +23,7 @@ const galleryCollections: { id: string; label: string; title: string; summary: s
       { src: "/images/4W3A8180_%282%29.jpg", alt: "תינוקת שוכבת על כרית ורודה ומביטה למעלה" },
       { src: "/images/צילום%20שיפי%200548517049%20%2813%29.jpg", alt: "ילדה עם תלתלים בסרבל עומדת בשביל בפארק" },
       { src: "/images/אילה%20וויג%20צלמת%20ניו%20בורן%20בבית%20הלקוח%20054-8524765%20%281%29.jpg", alt: "ילדה בכובע סרוג ליד אחיה התינוק בעריסה" },
+      { src: "/images/collage/collage-07.jpg", alt: "ילד צוחק יושב על המדרכה ליד אוטובוס צעצוע אדום" },
     ],
   },
   {
@@ -32,6 +33,8 @@ const galleryCollections: { id: string; label: string; title: string; summary: s
     summary: "הרגע שבו התלתלים נגזרים והכיפה עולה — עם כל ההתרגשות, הצחוק והמבטים של מי שמסביב.",
     images: [
       { src: "/images/hero-family.jpeg", alt: "שני ילדים עם כיפות יושבים על רצפת עץ ואוכלים רימון" },
+      { src: "/images/collage/collage-19.jpg", alt: "ילד במשקפי שמש יושב על ספסל עץ ליד אוטובוס צעצוע" },
+      { src: "/images/collage/collage-10.jpg", alt: "ילד עם אוזניות וסקייטבורד צוחק מול קיר גרפיטי" },
     ],
   },
   {
@@ -58,13 +61,13 @@ const collageTiles: CollageTile[] = [
   { kind: "word", text: "משפחה", d: "1 / 6 / span 2 / span 1", m: "2 / 1", order: 15 },
   { kind: "photo", src: "/images/collage/collage-13.jpg", alt: "שתי אחיות בכובעים בין חבילות קש", d: "3 / 1 / span 2 / span 4", m: "3 / 1 / span 1 / span 2", order: 6 },
   { kind: "photo", src: "/images/collage/collage-17.jpg", alt: "ילדה בשמלה צהובה שוכבת על ספסל אבן ומחייכת", d: "3 / 5 / span 2 / span 2", m: "5 / 2", order: 1 },
-  { kind: "photo", src: "/images/collage/collage-10.jpg", alt: "ילדה עם אוזניות וסקייטבורד צוחקת מול קיר גרפיטי", d: "5 / 1 / span 2 / span 1", m: "4 / 1 / span 2", order: 9 },
+  { kind: "photo", src: "/images/collage/collage-10.jpg", alt: "ילד עם אוזניות וסקייטבורד צוחק מול קיר גרפיטי", d: "5 / 1 / span 2 / span 1", m: "4 / 1 / span 2", order: 9 },
   { kind: "photo", src: "/images/collage/collage-20.jpg", alt: "ילדה בקפוצ'ון מרססת על קיר גרפיטי", d: "7 / 5 / span 2 / span 2", m: "9 / 1", order: 5 },
   { kind: "word", text: "אהבה", d: "5 / 5 / span 2 / span 1", m: "6 / 2", order: 16 },
   { kind: "word", text: "שמחה", d: "7 / 3 / span 2 / span 1", m: "10 / 1", order: 17 },
   { kind: "photo", src: "/images/collage/collage-11.jpg", alt: "ילד בכובע בוקרים נשען על גזע עץ", d: "5 / 4 / span 2 / span 1", m: "7 / 1 / span 2", order: 3 },
   { kind: "photo", src: "/images/4W3A8180_%282%29.jpg", alt: "תינוקת שוכבת על כרית ורודה ומביטה למעלה", d: "7 / 1 / span 2 / span 2", m: "7 / 2", order: 11 },
-  { kind: "photo", src: "/images/collage/collage-19.jpg", alt: "ילדה במשקפי שמש יושבת על ספסל עץ ליד אוטובוס צעצוע", d: "5 / 2 / span 2 / span 2", m: "6 / 1", order: 7 },
+  { kind: "photo", src: "/images/collage/collage-19.jpg", alt: "ילד במשקפי שמש יושב על ספסל עץ ליד אוטובוס צעצוע", d: "5 / 2 / span 2 / span 2", m: "6 / 1", order: 7 },
   { kind: "photo", src: "/images/5X3A6715-2.JPG", alt: "ילדה מחייכת יושבת על ארגז עץ בשדרת עצים", d: "5 / 6 / span 2 / span 1", m: "8 / 2 / span 2", order: 13 },
   { kind: "photo", src: "/images/צילום%20שיפי%200548517049%20%2813%29.jpg", alt: "ילדה עם תלתלים בסרבל עומדת בשביל בפארק", d: "7 / 4 / span 2 / span 1", m: "11 / 2 / span 2", order: 8 },
   { kind: "photo", src: "/images/collage/collage-12.jpg", alt: "ילד בכובע וחולצה משובצת צועד בשביל", d: "9 / 1 / span 2 / span 2", m: "10 / 2", order: 12 },
