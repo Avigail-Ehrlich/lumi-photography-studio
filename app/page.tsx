@@ -336,9 +336,9 @@ export default function Home() {
 
   return (
     <main dir="rtl" className="overflow-hidden bg-[var(--cream)] text-[var(--ink)]">
-      <header className="absolute inset-x-0 top-0 z-20 border-b border-white/25 text-white">
+      <header className="relative z-20 border-b border-[var(--line)] bg-[var(--cream)] text-[var(--ink)]">
         <div className="mx-auto flex h-20 max-w-[1500px] items-center justify-between px-5 sm:px-10 lg:px-16">
-          <a href="#top" className="brand-logo" aria-label="MB Photographer — דף הבית"><img src="/images/logo-light.png" alt="MB Photographer" /></a>
+          <a href="#top" className="brand-logo" aria-label="MB Photographer — דף הבית"><img src="/images/logo-dark.png" alt="MB Photographer" /></a>
           <nav className="header-nav hidden items-center gap-7 text-sm lg:flex" aria-label="ניווט ראשי">
             <a href="#portfolio">עבודות</a><a href="#sessions">סוגי צילום</a><a href="#about">אודות</a><a href="#testimonials">המלצות</a><a href="#pricing">מחירון</a><a href="#faq">שאלות</a><a href="#contact">יצירת קשר</a>
           </nav>
@@ -347,14 +347,15 @@ export default function Home() {
       </header>
 
       <section id="top" className="hero-section">
-        <div className={`hero-photo ${isBlocked(HERO_SRC) ? "is-filtered" : ""}`} role="img" aria-label="שני ילדים עם כיפות יושבים על רצפת עץ ואוכלים רימון" />
-        <div className="hero-shade" />
-        <div className="relative z-10 mx-auto flex min-h-[760px] max-w-[1500px] items-end px-5 pb-20 pt-32 sm:px-10 lg:min-h-screen lg:px-16 lg:pb-24">
-          <div className="hero-content max-w-[500px] text-white">
+        <div className="hero-grid mx-auto max-w-[1500px]">
+          <div className="hero-content">
             <p className="eyebrow mb-7">צילום משפחה · חלאקה · בת מצווה</p>
             <h1 className="display-title">הרגעים הקטנים<br />הם הסיפור.</h1>
-            <p className="mt-7 max-w-lg text-[1.05rem] leading-8 text-white/85 sm:text-lg">צילום טבעי ורגוע, באור רך ובקצב של הילדים — תמונות שיישארו הרבה אחרי שהבגדים כבר יהיו קטנים.</p>
+            <p className="hero-lead mt-7 max-w-lg text-[1.05rem] leading-8 sm:text-lg">צילום טבעי ורגוע, באור רך ובקצב של הילדים — תמונות שיישארו הרבה אחרי שהבגדים כבר יהיו קטנים.</p>
             <a href="#portfolio" className="hero-link mt-10 inline-flex items-center gap-3">לצפייה בעבודות <ArrowLeft size={17} strokeWidth={1.5} aria-hidden="true" /></a>
+          </div>
+          <div className="hero-media">
+            <div className={`hero-photo ${isBlocked(HERO_SRC) ? "is-filtered" : ""}`} role="img" aria-label="שני ילדים עם כיפות יושבים על רצפת עץ ואוכלים רימון" />
           </div>
         </div>
       </section>
