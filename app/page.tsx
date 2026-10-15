@@ -92,11 +92,9 @@ const FILTER_SAFE_IMAGES: { src: string; shape: Shape }[] = [
   { src: "/images/5X3A6715-2.JPG", shape: "portrait" },
   { src: "/images/צילום%20שיפי%200548517049%20%2813%29.jpg", shape: "portrait" },
 ];
-const isFilterSafe = (src: string) => FILTER_SAFE_IMAGES.some((image) => image.src === src);
 const safeImageAlt = (src: string) => collagePhotoTiles.find((tile) => tile.src === src)?.alt ?? "";
 // A collage slot spanning two or more desktop columns is landscape
 const collageShapes = collagePhotoTiles.map((tile): Shape => Number(tile.d.split("span").pop()) >= 2 ? "landscape" : "portrait");
-const IMAGE_MODE_KEY = "image-mode";
 
 // Content filters (נטיב, רימון, NetFree) replace a blocked image with a 3x3 mosaic of flat colour blocks,
 // with an icon in the centre. A real photo never has nearly every block perfectly flat.
@@ -270,11 +268,9 @@ export default function Home() {
   const [activeTab, setActiveTab] = useState(galleryCollections[0].id);
   const [lightbox, setLightbox] = useState<{ images: GalleryImage[]; index: number } | null>(null);
   const activeCollection = galleryCollections.find((collection) => collection.id === activeTab) ?? galleryCollections[0];
-  // `filtered` is the manual footer toggle: treat every image outside the safe set as blocked.
-  const [filtered, setFiltered] = useState(false);
   const [blockedImages, setBlockedImages] = useState<ReadonlySet<string>>(() => new Set());
   const markBlocked = useCallback((src: string) => setBlockedImages((current) => current.has(src) ? current : new Set(current).add(src)), []);
-  const isBlocked = (src: string) => blockedImages.has(src) || (filtered && !isFilterSafe(src));
+  const isBlocked = (src: string) => blockedImages.has(src);
   const availableSafe = FILTER_SAFE_IMAGES.filter((image) => !blockedImages.has(image.src));
   // Blocked images are swapped in place for a safe image of the same shape, rotating through them
   const replaceBlocked = (images: GalleryImage[], shapes?: Shape[]) => {
@@ -298,22 +294,12 @@ export default function Home() {
   useEffect(() => {
     let cancelled = false;
     (async () => {
-      let manual: string | null = null;
-      try { manual = localStorage.getItem(IMAGE_MODE_KEY); } catch {}
-      if (manual === "filtered" && !cancelled) setFiltered(true);
       for (const src of [HERO_SRC, ABOUT_SRC]) {
         if (await isImageBlocked(src) && !cancelled) markBlocked(src);
       }
     })();
     return () => { cancelled = true; };
   }, [markBlocked]);
-
-  const toggleFiltered = () => {
-    const next = !filtered;
-    setFiltered(next);
-    setLightbox(null);
-    try { localStorage.setItem(IMAGE_MODE_KEY, next ? "filtered" : "full"); } catch {}
-  };
 
   const openSession = (id: string) => {
     setActiveTab(id);
@@ -602,11 +588,8 @@ export default function Home() {
         <div className="credit-bar">
           <p className="credit-bar-inner">
             האתר עוצב ונבנה ע״י
-            <span className="credit-mark" dir="ltr">AJ<span>enda</span> Studio</span>
+            <a href="https://ajenda-studio.ajendastudio.workers.dev/" target="_blank" rel="noopener noreferrer" className="credit-mark" dir="ltr">AJ<span>enda</span> Studio</a>
           </p>
-          <button type="button" className="filter-toggle" onClick={toggleFiltered} aria-pressed={filtered}>
-            {filtered ? "תצוגה מותאמת לסינון: פעילה" : "תצוגה מותאמת לסינון"}
-          </button>
         </div>
       </footer>
     </main>

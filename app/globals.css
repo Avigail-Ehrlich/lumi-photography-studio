@@ -82,6 +82,8 @@ a:hover { opacity: .76; }
 .credit-bar-inner { display: flex; align-items: baseline; gap: 8px; margin: 0; text-align: center; }
 .credit-mark { font-family: Georgia, "Times New Roman", serif; font-size: 1rem; letter-spacing: .06em; color: rgba(255,255,255,.72); }
 .credit-mark span { color: var(--honey-light); }
+a.credit-mark { text-decoration: none; transition: color .2s ease; }
+a.credit-mark:hover, a.credit-mark:focus-visible { color: #fff; }
 .header-cta:hover { opacity: 1; transform: translateY(-3px); background: var(--espresso); color: white; box-shadow: 0 10px 22px rgba(0,0,0,.18); }
 .hero-section { position: relative; background: var(--cream); }
 /* Split hero: copy on the right, the photo on the left at its own 3:2 ratio so nothing is cropped or covered */
@@ -595,8 +597,6 @@ a:hover { opacity: .76; }
 /* Filtered-internet mode (see FILTER_SAFE_IMAGES in page.tsx) */
 .about-photo-image.is-filtered { background-image: url("/images/collage/collage-07.jpg"); }
 .hero-photo.is-filtered { background-image: url("/images/collage/collage-19.jpg"); }
-.filter-toggle { padding: 0; border: 0; border-bottom: 1px solid rgba(255,255,255,.25); background: none; color: inherit; font: inherit; cursor: pointer; transition: color .2s ease, border-color .2s ease; }
-.filter-toggle:hover, .filter-toggle:focus-visible, .filter-toggle[aria-pressed="true"] { color: var(--honey-light); border-color: currentColor; }
 .collage-link span { text-align: center; }
 
 /* About: brand logo above the intro copy */
