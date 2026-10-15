@@ -149,7 +149,10 @@ function CheckedImage({ src, alt, onBlocked }: { src: string; alt: string; onBlo
   const ref = useRef<HTMLImageElement>(null);
   const check = useCallback(() => {
     const img = ref.current;
-    if (img && (img.naturalWidth === 0 || isMosaic(img))) onBlocked(src);
+    if (!img) return;
+    if (img.naturalWidth === 0 || isMosaic(img)) { onBlocked(src); return; }
+    // Lets the gallery's justified rows size the tile to the photo
+    img.parentElement?.style.setProperty("--ratio", String(img.naturalWidth / img.naturalHeight));
   }, [src, onBlocked]);
   // The image may have finished loading before hydration attached onLoad
   useEffect(() => { if (ref.current?.complete) check(); }, [check]);
