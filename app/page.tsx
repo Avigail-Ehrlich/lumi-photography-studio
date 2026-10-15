@@ -81,6 +81,11 @@ const collagePhotoTiles = collageTiles.flatMap((tile) => tile.kind === "photo" ?
 
 const HERO_SRC = "/images/hero-sisters.jpg";
 const ABOUT_SRC = "/images/NF1A1128_%D7%9E%D7%95%D7%A7%D7%98%D7%9F.jpg";
+// Safe replacements for the two CSS background photos (must match the .is-filtered rules in globals.css)
+const BACKGROUND_FALLBACKS: Record<string, string> = {
+  [HERO_SRC]: "/images/collage/collage-19.jpg",
+  [ABOUT_SRC]: "/images/collage/collage-07.jpg",
+};
 
 // Images that pass the common Israeli content filters (checked by the photographer on a filtered line).
 // Any image the viewer's filter blocks is swapped in place for one of these; repeats are fine for now.
@@ -150,19 +155,27 @@ function isImageBlocked(src: string): Promise<boolean> {
   });
 }
 
-// An <img> that reports when the viewer's content filter blocked it
+// An <img> that stays hidden until it has loaded and passed the filter check, then fades in.
+// A blocked image is reported instead, so the viewer never sees the mosaic or the swap.
+// Callers key it by src, so a replacement starts hidden again.
 function CheckedImage({ src, alt, onBlocked }: { src: string; alt: string; onBlocked: (src: string) => void }) {
   const ref = useRef<HTMLImageElement>(null);
+  const [ready, setReady] = useState(false);
   const check = useCallback(() => {
     const img = ref.current;
     if (!img) return;
     if (img.naturalWidth === 0 || isMosaic(img)) { onBlocked(src); return; }
     // Lets the gallery's justified rows size the tile to the photo
     (img.closest<HTMLElement>(".gallery-tile") ?? img.parentElement)?.style.setProperty("--ratio", String(img.naturalWidth / img.naturalHeight));
+    setReady(true);
   }, [src, onBlocked]);
   // The image may have finished loading before hydration attached onLoad
-  useEffect(() => { if (ref.current?.complete) check(); }, [check]);
-  return <img ref={ref} src={src} alt={alt} loading="lazy" onLoad={check} onError={() => onBlocked(src)} />;
+  useEffect(() => {
+    if (!ref.current?.complete) return;
+    const frame = requestAnimationFrame(check);
+    return () => cancelAnimationFrame(frame);
+  }, [check]);
+  return <img ref={ref} src={src} alt={alt} loading="lazy" data-checked className={ready ? "is-ready" : undefined} onLoad={check} onError={() => onBlocked(src)} />;
 }
 
 // Placeholder quotes: replace with real testimonials before going live.
@@ -269,6 +282,8 @@ export default function Home() {
   const [lightbox, setLightbox] = useState<{ images: GalleryImage[]; index: number } | null>(null);
   const activeCollection = galleryCollections.find((collection) => collection.id === activeTab) ?? galleryCollections[0];
   const [blockedImages, setBlockedImages] = useState<ReadonlySet<string>>(() => new Set());
+  // Background photos (hero, about) that have been checked and may be shown
+  const [readyBackgrounds, setReadyBackgrounds] = useState<ReadonlySet<string>>(() => new Set());
   const markBlocked = useCallback((src: string) => setBlockedImages((current) => current.has(src) ? current : new Set(current).add(src)), []);
   const isBlocked = (src: string) => blockedImages.has(src);
   const availableSafe = FILTER_SAFE_IMAGES.filter((image) => !blockedImages.has(image.src));
@@ -293,11 +308,17 @@ export default function Home() {
 
   useEffect(() => {
     let cancelled = false;
-    (async () => {
-      for (const src of [HERO_SRC, ABOUT_SRC]) {
-        if (await isImageBlocked(src) && !cancelled) markBlocked(src);
-      }
-    })();
+    for (const src of [HERO_SRC, ABOUT_SRC]) {
+      (async () => {
+        if (await isImageBlocked(src)) {
+          if (cancelled) return;
+          markBlocked(src);
+          // Load the replacement before revealing, so it fades in whole
+          await isImageBlocked(BACKGROUND_FALLBACKS[src]);
+        }
+        if (!cancelled) setReadyBackgrounds((current) => new Set(current).add(src));
+      })();
+    }
     return () => { cancelled = true; };
   }, [markBlocked]);
 
@@ -349,7 +370,7 @@ export default function Home() {
             <a href="#portfolio" className="hero-link mt-10 inline-flex items-center gap-3">לצפייה בעבודות <ArrowLeft size={17} strokeWidth={1.5} aria-hidden="true" /></a>
           </div>
           <div className="hero-media">
-            <div className={`hero-photo ${isBlocked(HERO_SRC) ? "is-filtered" : ""}`} role="img" aria-label="שתי אחיות בכובעים מחייכות בין חבילות קש" />
+            <div className={`hero-photo ${isBlocked(HERO_SRC) ? "is-filtered" : ""} ${readyBackgrounds.has(HERO_SRC) ? "is-ready" : ""}`} role="img" aria-label="שתי אחיות בכובעים מחייכות בין חבילות קש" />
           </div>
         </div>
       </section>
@@ -357,7 +378,7 @@ export default function Home() {
       <section id="about" className="reveal-section bg-[var(--espresso)] text-white">
         <div className="mx-auto grid max-w-[1500px] lg:grid-cols-2">
           <div className="about-photo relative min-h-[520px] lg:min-h-[760px]">
-            <div className={`about-photo-image ${isBlocked(ABOUT_SRC) ? "is-filtered" : ""}`} role="img" aria-label="תמונת מצלמת צילום משפחה" />
+            <div className={`about-photo-image ${isBlocked(ABOUT_SRC) ? "is-filtered" : ""} ${readyBackgrounds.has(ABOUT_SRC) ? "is-ready" : ""}`} role="img" aria-label="תמונת מצלמת צילום משפחה" />
           </div>
           <div className="reveal-copy flex items-center px-6 py-20 sm:px-14 lg:px-20 lg:py-24">
             <div className="max-w-xl">
@@ -399,7 +420,7 @@ export default function Home() {
               const photo = collagePhotos[slot];
               return (
                 <button key={tile.src} type="button" className="collage-tile collage-photo" style={style} onClick={() => setLightbox({ images: collagePhotos, index: slot })} aria-label={`הגדלת התמונה: ${photo.alt}`}>
-                  <CheckedImage src={photo.src} alt={photo.alt} onBlocked={markBlocked} />
+                  <CheckedImage key={photo.src} src={photo.src} alt={photo.alt} onBlocked={markBlocked} />
                 </button>
               );
             })}
@@ -465,7 +486,7 @@ export default function Home() {
             <div className="gallery-masonry">
               {galleryImages.map((image, index) => (
                 <button key={`${activeCollection.id}-${index}`} type="button" className="gallery-tile" onClick={() => setLightbox({ images: galleryImages, index })} aria-label={`הגדלת התמונה: ${image.alt}`}>
-                  <span className="gallery-tile-media"><CheckedImage src={image.src} alt={image.alt} onBlocked={markBlocked} /></span>
+                  <span className="gallery-tile-media"><CheckedImage key={image.src} src={image.src} alt={image.alt} onBlocked={markBlocked} /></span>
                   <span className="gallery-tile-zoom" aria-hidden="true"><Plus size={20} strokeWidth={1.25} /></span>
                 </button>
               ))}
